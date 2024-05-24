@@ -3518,7 +3518,20 @@ function Library:CreateWindow(...)
         ModalElement.Modal = Toggled;
 
         if Toggled then
+            -- A bit scuffed, but if we're going from not toggled -> toggled we want to show the frame immediately so that the fade is visible.
             Outer.Visible = true;
+
+            task.spawn(function()
+                local State = InputService.MouseIconEnabled;
+
+                while Toggled and ScreenGui.Parent do
+                    InputService.MouseIconEnabled = true;
+
+                    RenderStepped:Wait();
+                end;
+
+                InputService.MouseIconEnabled = State;
+            end);
         end;
 
         for _, Desc in next, Outer:GetDescendants() do
